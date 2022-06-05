@@ -1,9 +1,10 @@
-use opentelemetry::sdk::trace::{SamplingDecision, SamplingResult, Tracer, TracerProvider};
+use opentelemetry::sdk::trace::{Tracer, TracerProvider};
+use opentelemetry::trace::OrderMap;
 use opentelemetry::{
     trace as otel,
     trace::{
         noop, SpanBuilder, SpanContext, SpanId, SpanKind, TraceContextExt, TraceFlags, TraceId,
-        TraceState,
+        TraceState, SamplingResult, SamplingDecision
     },
     Context as OtelContext,
 };
@@ -85,7 +86,7 @@ impl PreSampledTracer for Tracer {
                 trace_id,
                 &builder.name,
                 builder.span_kind.as_ref().unwrap_or(&SpanKind::Internal),
-                builder.attributes.as_deref().unwrap_or(&[]),
+                &builder.attributes.to_owned().unwrap_or(OrderMap::new()),
                 builder.links.as_deref().unwrap_or(&[]),
                 self.instrumentation_library(),
             ));
